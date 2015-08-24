@@ -1,0 +1,90 @@
+/*
+    Author : RAJON BARDHAN
+    AUST CSE 27th Batch
+    All my programming success are dedicated to my mom , dad , little sister madhobi , teachers , friends and love TANIA SULTANA RIMY
+
+    Problem Name : 1846 - GCD 2010 ( Timus )
+    ALGORITHM : Segment Tree
+*/
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#define pb push_back
+#define ff first
+#define ss second
+#define mp make_pair
+#define memo(a,b) memset(a,b,sizeof(a))
+#define INF 1e9
+#define EPS 1e-8
+#define PI 3.14159265358979323846
+
+typedef long long ll ;
+typedef unsigned long long ull ;
+
+/* int dx[] = {1,-1,0,0} , dy[] = {0,0,1,-1}; */ // 4 Direction
+/* int dx[] = {1,-1,0,0,1,1,-1,-1} , dy[] = {0,0,1,-1,1,-1,1,-1}; */ // 8 Direction
+/* int dx[] = {1,-1,1,-1,2,2,-2,-2} , dy[] = {2,2,-2,-2,1,-1,1,-1}; */ // Knight Direction
+/* int dx[] = {2,-2,1,1,-1,-1} , dy[] = {0,0,1,-1,1,-1}; */ // Hexagonal Direction
+
+set < pair<int,int> > S ;
+int tree[3*100000+10];
+char d[2];
+
+void update(int node,int lo,int hi,int index, int val)
+{
+    if(lo>index||hi<index) return ;
+    if(lo==index&&hi==index)
+    {
+        tree[node] = val ;
+        return ;
+    }
+
+    int mid = (lo+hi)/2;
+    update(2*node,lo,mid,index,val);
+    update(2*node+1,mid+1,hi,index,val);
+
+    if(tree[2*node]==0) tree[node] = tree[2*node+1] ;
+    else if(tree[2*node+1]==0) tree[node] = tree[2*node] ;
+    else tree[node] = __gcd(tree[2*node],tree[2*node+1]);
+}
+
+void add(int A,int index)
+{
+    S.insert(mp(A,index));
+    update(1,0,100000,index,A);
+}
+
+void del(int A,int index)
+{
+    set < pair<int,int> > :: iterator it = S.upper_bound(mp(A,1000000));
+    --it;
+    update(1,0,100000,it->ss,0);
+    S.erase(it);
+}
+
+int main()
+{
+    //freopen("input.txt","r",stdin);
+    //freopen("output.txt","w",stdout);
+    int Q , A ;
+    scanf("%d",&Q);
+
+    for(int i=0;i<Q;i++)
+    {
+        scanf("%s%d",&d,&A);
+
+        switch( d[0] )
+        {
+            case '+':
+                add(A,i);
+                printf("%d\n",tree[1]==0?1:tree[1]);
+                break ;
+            case '-':
+                del(A,i);
+                printf("%d\n",tree[1]==0?1:tree[1]);
+                break ;
+        }
+    }
+    return 0;
+}
